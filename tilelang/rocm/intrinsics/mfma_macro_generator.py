@@ -475,9 +475,11 @@ class MatrixCoreIntrinEmitter:
         k_pack = self.k_pack
         mfma_suffix = self.mfma_suffix
         a_dtype, b_dtype, out_dtype = self.a_dtype, self.b_dtype, self.accum_dtype
-        compute_a_dtype = a_dtype if local_size_a == 1 else f"{a_dtype}x{local_size_a}"
-        compute_b_dtype = b_dtype if local_size_b == 1 else f"{b_dtype}x{local_size_b}"
-        compute_out_dtype = out_dtype if local_size_out == 1 else f"{out_dtype}x{local_size_out}"
+        # The intrinsic takes dtype names as string arguments; a bare DataType (the
+        # single-element fp32 MFMA operands) is not a PrimExpr and fails Call's checks.
+        compute_a_dtype = str(a_dtype) if local_size_a == 1 else f"{a_dtype}x{local_size_a}"
+        compute_b_dtype = str(b_dtype) if local_size_b == 1 else f"{b_dtype}x{local_size_b}"
+        compute_out_dtype = str(out_dtype) if local_size_out == 1 else f"{out_dtype}x{local_size_out}"
 
         a_is_fragment = is_fragment(A_local_buf)
         b_is_fragment = is_fragment(B_local_buf)
